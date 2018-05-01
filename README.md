@@ -1,5 +1,4 @@
-﻿
-# Fusion Node + Express API Skeleton
+﻿# Fusion Node + Express API Skeleton
 
 ## Purpose
 
@@ -64,6 +63,50 @@ npm run develop
 ```
 
 Then browse to `/api-docs` to view all of the paths supported by the API.
+
+### Building with Docker
+
+You will need to have the Docker engine installed and running before executing any of the below. See the Docker [downloads page](https://www.docker.com/community-edition) for more details.
+
+#### Build the image
+
+From the root of the project:
+
+```bash
+docker build -t express-scaffold -f Dockerfile .
+```
+
+#### Run an ephemeral container
+
+In the examples below, I'm running the app on port 8080, and mapping 8080 of the host to that of the docker container with the `-p` flag. If, for example, you wanted to bind to port 9090 on the host but still run the server on 8080 inside the container, the argument would be `-p 9090:8080`. If you want to change the port on which the server is running inside the container, you can do so by changing the `PORT=` line of your .env file.
+
+##### Option 1: Pass .env contents as true env vars
+
+This involves a bit less overhead than option 2 below, and it should be used when you don't have any sensitive information in your .env file. The rationale is that env vars have a tendency to end up in logs in plaintext unless you take additional steps to cleanse/obfuscate.
+
+```bash
+docker run --rm -d -p 8080:8080 --name express-scaffold-container --env-file <path-to-.env-file> express-scaffold
+```
+
+##### Option 2: Pass .env file as a volume
+
+Rather than translating your .env file, this option mounts the file itself into the docker container. Unlike with env vars, the contents of this file are less likely to inadvertently wind up in your logs.
+
+```bash
+docker run --rm -d -p 8080:8080 -v <absolute-path-to-.env-file-in-your-project>:/app/config/.env --name express-scaffold-container express-scaffold
+```
+
+#### Accessing the service
+
+This is no different than running outside of docker: access `localhost:8080/api`. Be sure to use the same port to which you established the binding in the run step with the `-p` argument.
+
+#### Stopping the container and cleaning up
+
+Running the container with the `--rm` flag will clean it up whenever it stops. To stop the container:
+
+```bash
+docker stop express-scaffold-container
+```
 
 ## Troubleshooting
 
